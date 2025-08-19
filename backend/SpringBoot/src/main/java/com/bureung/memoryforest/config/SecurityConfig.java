@@ -4,6 +4,7 @@ import com.bureung.memoryforest.auth.application.CustomOAuth2UserService;
 import com.bureung.memoryforest.auth.oauth.OAuth2LoginSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,6 +24,9 @@ import java.util.Arrays;
 @RequiredArgsConstructor  //의존성 주입 어노테이션임
 public class SecurityConfig {
 
+
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
@@ -80,7 +84,7 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)
                         )
                         .successHandler(oAuth2LoginSuccessHandler)
-                        .failureUrl("http://localhost:3000/?error=oauth")
+                        .failureUrl(baseUrl + "?error=oauth")
                 )
                 .logout(logout -> logout.disable()); // 로그아웃 비활성화
 
@@ -92,7 +96,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // 허용할 Origin 설정
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000", "http://localhost:*"));
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000", "http://localhost:*","http://54.253.135.27:3000","http://bureung.site","https://bureung.site"));
 
         // 허용할 HTTP 메서드
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

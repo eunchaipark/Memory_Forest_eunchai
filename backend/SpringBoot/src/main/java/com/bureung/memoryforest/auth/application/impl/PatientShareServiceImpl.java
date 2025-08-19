@@ -29,7 +29,7 @@ public class PatientShareServiceImpl implements PatientShareService {
     private final RefreshTokenService refreshTokenService;
     private final UserService userService;
 
-    @Value("${app.base-url:http://localhost:3000}")
+    @Value("${app.base-url}")
     private String baseUrl;
 
     @Value("${app.patient-share.link-expiration-hours:24}")
