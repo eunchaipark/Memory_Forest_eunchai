@@ -12,14 +12,24 @@ export default defineConfig({
     exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
   },
   server: {
-    host: '0.0.0.0',  // leb.Delete when deploying
-    port: 3000,       // leb.Delete when deploying
+    host: '0.0.0.0', // leb.Delete when deploying
+    port: 3000,      // leb.Delete when deploying
+    allowedHosts: [
+      'bureung.site',
+      'www.bureung.site', // www 서브도메인도 허용
+      'localhost',
+      '127.0.0.1'
+    ],
     watch: {
-      usePolling: true  // leb.Delete when deploying
+      usePolling: true, // leb.Delete when deploying
+    },
+    preview: {
+      port: 80,
+      host: '0.0.0.0',
     },
     headers: {
-      "Cross-Origin-Opener-Policy" : "same-origin",
-      "Cross-Origin-Embedder-Policy" : "unsafe-none",
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'unsafe-none',
     },
   },
   resolve: {

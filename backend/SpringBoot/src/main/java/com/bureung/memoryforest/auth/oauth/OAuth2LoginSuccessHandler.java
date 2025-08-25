@@ -12,7 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
-
+import org.springframework.beans.factory.annotation.Value;
 import java.io.IOException;
 
 @Slf4j
@@ -22,11 +22,13 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     private final UserService userService;
 
+    @Value("${app.base-url}")
+    private String baseUrl;
+
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+    public void onAuthenticationSuccess(HttpServletRequest request,
+                                        HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
-
-
         try {
             CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
             User user = oAuth2User.getUser();
@@ -52,7 +54,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             session.setAttribute("userTypeCode", user.getUserTypeCode());
             session.setAttribute("loginType", user.getLoginType());
 
-            String redirectUrl = "http://localhost:3000/companion/dashboard";
+            String redirectUrl = baseUrl + "/companion/dashboard";
 
             log.info("OAuth 로그인 완료, 리다이렉트: {}", redirectUrl);
 
@@ -60,14 +62,14 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(redirectUrl)
                     .queryParam("loginSuccess", true)
                     .queryParam("loginType", user.getLoginType());
-//                    .queryParam("userName", user.getUserName());  // 한글 인코딩 때문에 리다이렉트 실패함...그냥 프론트에서 가지고 오게 수정할게여
+//                  .queryParam("userName", user.getUserName());  // 한글 인코딩 문제 → 프론트에서 처리
 
             getRedirectStrategy().sendRedirect(request, response, uriBuilder.build().toUriString());
         } catch (Exception e) {
             log.error("OAuth2 성공 핸들러에서 오류 발생: ", e);
-            // 에러 발생시 기본 URL로 리다이렉트
+            // 에러 발생 시 기본 URL로 리다이렉트
             getRedirectStrategy().sendRedirect(request, response,
-                    "http://localhost:3000/companion/dashboard?loginSuccess=true&error=handler");
+                    baseUrl + "/companion/dashboard?loginSuccess=true&error=handler");
         }
     }
 }

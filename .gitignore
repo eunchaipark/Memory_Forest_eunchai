@@ -12,3 +12,5 @@ docker/airflow/logs/
 *.log
 **/data/
 .env
+
+/backend/SpringBoot/src/main/resources/

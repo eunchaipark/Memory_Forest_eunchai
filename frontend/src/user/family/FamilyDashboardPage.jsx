@@ -63,6 +63,7 @@ function FamilyDashboardPage() {
     const filterGames = (games, keyword) => {
         if (!keyword.trim()) return games;
 
+
         return games.filter(game =>
             game.gameName.toLowerCase().includes(keyword.toLowerCase()) ||
             game.players.some(player =>
@@ -71,7 +72,6 @@ function FamilyDashboardPage() {
         );
     };
 
-    // 검색어가 변경될 때마다 필터링 실행
     useEffect(() => {
         const filtered = filterGames(gameList, searchKeyword);
         setFilteredGameList(filtered);
@@ -97,11 +97,13 @@ function FamilyDashboardPage() {
         }
     };
 
+
     const getRelationshipName = (code) => {
         if (Array.isArray(relationshipCodes)) {
             return relationshipCodes.find(item => item.codeId === code)?.codeName || code;
         }
     };
+
 
     useEffect(() => {
         const loadCommonCodes = async () => {
@@ -476,7 +478,11 @@ function FamilyDashboardPage() {
                                             <span
                                                 className="patient-age">({recorder.birthDate ? calculateAge(recorder.birthDate) : ''}세)</span>
                                         </div>
+
                                         <div className="extra-desc">최근 활동 : {recorder.lastActivityDate}</div>
+
+
+
                                     </div>
                                     <button className="btn-detail me-1">
                                         <div className="btn more-btn"
@@ -488,10 +494,12 @@ function FamilyDashboardPage() {
                                     </button>
                                 </div>
                                 <div className="row risk-con mt-2">
+
                                     <div className="risk-title col-3">평균 정답률</div>
                                     <div className="col-9 risk-bar-con d-flex align-items-center">
                                         <div className="risk-bar-bg">
                                             <div className="risk-bar-fill" style={{width: `${recorder.averageCorrectRate}%`}}></div>
+
                                         </div>
                                     </div>
                                 </div>
