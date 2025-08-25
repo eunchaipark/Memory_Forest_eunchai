@@ -63,6 +63,7 @@ function FamilyDashboardPage() {
     const filterGames = (games, keyword) => {
         if (!keyword.trim()) return games;
 
+
         return games.filter(game =>
             game.gameName.toLowerCase().includes(keyword.toLowerCase()) ||
             game.players.some(player =>
@@ -71,7 +72,6 @@ function FamilyDashboardPage() {
         );
     };
 
-    // 검색어가 변경될 때마다 필터링 실행
     useEffect(() => {
         const filtered = filterGames(gameList, searchKeyword);
         setFilteredGameList(filtered);
@@ -97,11 +97,13 @@ function FamilyDashboardPage() {
         }
     };
 
+
     const getRelationshipName = (code) => {
         if (Array.isArray(relationshipCodes)) {
             return relationshipCodes.find(item => item.codeId === code)?.codeName || code;
         }
     };
+
 
     useEffect(() => {
         const loadCommonCodes = async () => {
@@ -197,31 +199,45 @@ function FamilyDashboardPage() {
     };
 
     // 카카오톡 공유 함수
-    const shareKakao = () => {
+    const shareKakao = async () => {
         if (!window.Kakao) {
             alert('카카오 SDK가 로드되지 않았습니다.');
             return;
         }
 
-        if (!shareUrl) {
-            alert('공유할 링크가 없습니다.');
+        const currentRecorder = recorderList.find(recorder => recorder.userName === currentPatientName);
+        if (!currentRecorder) {
+            alert('환자 정보를 찾을 수 없습니다.');
             return;
         }
 
         try {
-            window.Kakao.Share.sendDefault({
-                objectType: 'feed',
-                content: {
-                    title: '오늘의 문제를 풀어보세요.',
-                    description: `${currentPatientName}님이 만든 기억숲 게임에 참여해보세요`,
-                    link: {
-                        mobileWebUrl: shareUrl,
-                        webUrl: shareUrl
-                    }
+            const response = await fetch(`${window.API_BASE_URL}/api/recorder/${currentRecorder.userId}/share`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                installTalk: true,
-                throughTalk: false
+                credentials: 'include'
             });
+            const data = await response.json();
+
+            if (data.success) {
+                window.Kakao.Share.sendDefault({
+                    objectType: 'feed',
+                    content: {
+                        title: '오늘의 문제를 풀어보세요.',
+                        description: `기억숲 게임에 참여해보세요`,
+                        link: {
+                            mobileWebUrl: data.shareUrl,
+                            webUrl: data.shareUrl
+                        }
+                    },
+                    installTalk: true,
+                    throughTalk: false
+                });
+            } else {
+                alert(data.message || '공유 링크 생성에 실패했습니다.');
+            }
         } catch (error) {
             console.error('카카오톡 공유 실패:', error);
             alert('카카오톡 공유에 실패했습니다.');
@@ -462,7 +478,11 @@ function FamilyDashboardPage() {
                                             <span
                                                 className="patient-age">({recorder.birthDate ? calculateAge(recorder.birthDate) : ''}세)</span>
                                         </div>
-                                        <div className="extra-desc">최근 활동 : 2025-06-20</div>
+
+                                        <div className="extra-desc">최근 활동 : {recorder.lastActivityDate}</div>
+
+
+
                                     </div>
                                     <button className="btn-detail me-1">
                                         <div className="btn more-btn"
@@ -474,10 +494,12 @@ function FamilyDashboardPage() {
                                     </button>
                                 </div>
                                 <div className="row risk-con mt-2">
-                                    <div className="risk-title col-3">평균 위험도</div>
+
+                                    <div className="risk-title col-3">평균 정답률</div>
                                     <div className="col-9 risk-bar-con d-flex align-items-center">
                                         <div className="risk-bar-bg">
-                                            <div className="risk-bar-fill"></div>
+                                            <div className="risk-bar-fill" style={{width: `${recorder.averageCorrectRate}%`}}></div>
+
                                         </div>
                                     </div>
                                 </div>
